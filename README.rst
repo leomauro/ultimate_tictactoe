@@ -49,3 +49,4 @@ To connect a client as a human player ::
 or with the provided AI player ::
 
     $ board-play.py t3 t3.jrb_mcts
+

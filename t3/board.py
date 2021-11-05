@@ -33,29 +33,33 @@ class Board(object):
         bot = u"\u255a" + u"\u2569".join(sub for x in range(3)) + u"\u255d\n"
         if action:
             bot += u"Last played: {0}\n".format(
-                self.to_notation(self.to_compact_action(action)))
+                    self.to_notation(self.to_compact_action(action)))
         bot += u"Player: {0}\n".format(state['player'])
 
-        constraint = (state['constraint']['outer-row'], state['constraint']['outer-column'])
+        constraint = (state['constraint']['outer-row'],
+                      state['constraint']['outer-column'])
 
         return (
-            top +
-            div.join(
-                sep.join(
-                    u"\u2551" +
-                    u"\u2551".join(
-                        u"\u2502".join(
-                            pieces.get((R, C, r, c), u"\u2592" if constraint in ((R, C), (None, None)) else " ")
-                            for c in range(3)
+                top +
+                div.join(
+                        sep.join(
+                                u"\u2551" +
+                                u"\u2551".join(
+                                        u"\u2502".join(
+                                                pieces.get((R, C, r, c),
+                                                           u"\u2592" if constraint in (
+                                                           (R, C), (None, None))
+                                                           else " ")
+                                                for c in range(3)
+                                        )
+                                        for C in range(3)
+                                ) +
+                                u"\u2551\n"
+                                for r in range(3)
                         )
-                        for C in range(3)
-                    ) +
-                    u"\u2551\n"
-                    for r in range(3)
-                )
-                for R in range(3)
-            ) +
-            bot
+                        for R in range(3)
+                ) +
+                bot
         )
 
     def to_compact_state(self, data):
@@ -69,7 +73,7 @@ class Board(object):
         for item in data['pieces']:
             R, C, player = item['outer-row'], item['outer-column'], item['player']
             r, c = item['inner-row'], item['inner-column']
-            state[2*(3*R + C) + player - 1] += 1 << (3 * r + c)
+            state[2 * (3 * R + C) + player - 1] += 1 << (3 * r + c)
 
         for item in data['boards']:
             players = (1, 2)
@@ -92,15 +96,15 @@ class Board(object):
                     for c in range(3):
                         index = 1 << (3 * r + c)
 
-                        if index & state[2*(3*R + C)]:
+                        if index & state[2 * (3 * R + C)]:
                             pieces.append({
-                                'player': 1, 'type': 'X',
+                                'player':    1, 'type': 'X',
                                 'outer-row': R, 'outer-column': C,
                                 'inner-row': r, 'inner-column': c,
                             })
-                        if index & state[2*(3*R + C) + 1]:
+                        if index & state[2 * (3 * R + C) + 1]:
                             pieces.append({
-                                'player': 2, 'type': 'O',
+                                'player':    2, 'type': 'O',
                                 'outer-row': R, 'outer-column': C,
                                 'inner-row': r, 'inner-column': c,
                             })
@@ -108,25 +112,25 @@ class Board(object):
                 board_index = 1 << (3 * R + C)
                 if board_index & p1_boards & p2_boards:
                     boards.append({
-                        'player': None, 'type': 'full',
+                        'player':    None, 'type': 'full',
                         'outer-row': R, 'outer-column': C,
                     })
                 elif board_index & p1_boards:
                     boards.append({
-                        'player': 1, 'type': 'X',
+                        'player':    1, 'type': 'X',
                         'outer-row': R, 'outer-column': C,
                     })
                 elif board_index & p2_boards:
                     boards.append({
-                        'player': 2, 'type': 'O',
+                        'player':    2, 'type': 'O',
                         'outer-row': R, 'outer-column': C,
                     })
 
         return {
-            'pieces': pieces,
-            'boards': boards,
-            'constraint': {'outer-row': state[20], 'outer-column': state[21]},
-            'player': player,
+            'pieces':          pieces,
+            'boards':          boards,
+            'constraint':      {'outer-row': state[20], 'outer-column': state[21]},
+            'player':          player,
             'previous_player': 3 - player,
         }
 
@@ -170,7 +174,7 @@ class Board(object):
 
         wins = (0o7, 0o70, 0o700, 0o111, 0o222, 0o444, 0o421, 0o124)
 
-        full = (state[board_index] | state[board_index+1] == 0o777)
+        full = (state[board_index] | state[board_index + 1] == 0o777)
         if any(updated_board & w == w for w in wins):
             state[18 + player_index] |= 1 << (3 * R + C)
         elif full:
@@ -202,7 +206,7 @@ class Board(object):
         player_index = player - 1
 
         # Is the square within the sub-board already taken?
-        occupied = state[board_index] | state[board_index+1]
+        occupied = state[board_index] | state[board_index + 1]
         if occupied & 1 << (3 * r + c):
             return False
 
@@ -231,7 +235,7 @@ class Board(object):
             for r in range(3)
             for c in range(3)
             if not occupied[3 * R + C] & 1 << (3 * r + c)
-            and not finished & 1 << (3 * R + C)
+               and not finished & 1 << (3 * R + C)
         ]
 
         return actions
